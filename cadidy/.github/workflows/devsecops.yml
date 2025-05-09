@@ -1,0 +1,36 @@
+name: DevSecOps Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  flutter-analyze:
+    name: Flutter Analyze & Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Format Check
+        run: flutter format --set-exit-if-changed .
+
+      - name: Static Analysis
+        run: flutter analyze
+
+      - name: Run Tests
+        run: flutter test
+
+      - name: Dart Code Metrics (Optional Security/Lint Rules)
+        run: |
+          flutter pub global activate dart_code_metrics
+          ~/.pub-cache/bin/dcm analyze lib
